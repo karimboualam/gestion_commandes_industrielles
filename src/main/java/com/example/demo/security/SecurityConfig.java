@@ -13,6 +13,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
+
 @Configuration
 public class SecurityConfig {
 
@@ -29,8 +31,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Désactiver CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Autoriser endpoints d'authentification
-                        .requestMatchers("/api/utilisateurs/register").permitAll() // Autoriser l'inscription
-                        .requestMatchers("/api/commandes/**").hasRole("USER") // Nécessite le rôle USER
+                        .requestMatchers("/api/auth/register").permitAll() // Autoriser l'inscription
+                        .requestMatchers("/api/commandes/**").hasAnyRole("USER", "ADMIN") // Autoriser les commandes pour USER et ADMIN
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -45,17 +47,18 @@ public class SecurityConfig {
 
 
 
-    // Définition de la configuration CORS
+    // Configuration CORS
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); // Permettre l'envoi de cookies/credentials
+        config.setAllowCredentials(true); // Autoriser les cookies et credentials
         config.addAllowedOrigin("http://localhost:4200"); // Autoriser Angular en local
-        config.addAllowedHeader("*"); // Autoriser tous les headers
-        config.addAllowedMethod("*"); // Autoriser toutes les méthodes HTTP (GET, POST, PUT, DELETE)
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type")); // Autoriser certains headers
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Méthodes HTTP autorisées
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // Appliquer cette config à toutes les routes
+        source.registerCorsConfiguration("/**", config); // Appliquer la config CORS à toutes les routes
         return source;
     }
+
 }

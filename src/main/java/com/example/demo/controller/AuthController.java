@@ -30,15 +30,13 @@ public class AuthController {
         return utilisateurService.findByEmail(email)
                 .filter(utilisateur -> passwordEncoder.matches(password, utilisateur.getPassword()))
                 .map(utilisateur -> {
-                    // Récupérez le rôle de l'utilisateur
-                    String role = utilisateur.getRole();
+                    // Convertir l'enum Role en String
+                    String role = utilisateur.getRole().name(); // Utilisez .name() pour obtenir la valeur String de l'enum
+                    String token = jwtTokenProvider.generateToken(email, role); // Générez le token
 
-                    // Générez le token avec email et rôle
-                    String token = jwtTokenProvider.generateToken(email, role);
-
-                    return ResponseEntity.ok(Map.of("token", token));
+                    // Incluez le rôle dans la réponse
+                    return ResponseEntity.ok(Map.of("token", token, "role", role));
                 })
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid email or password")));
     }
-
 }
