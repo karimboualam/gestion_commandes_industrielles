@@ -1,36 +1,26 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "commandes")
 public class Commande {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Génération automatique de l'ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String description;
 
-    private LocalDate date;
+    private LocalDateTime dateCommande;
+
+    private String status;
 
     @ManyToOne
-    @JoinColumn(name = "utilisateur_id")
-    private Utilisateur utilisateur;
+    @JoinColumn(name = "utilisateur_id", nullable = false)
+    private Utilisateur utilisateur; // Association avec l'utilisateur
 
-
-    // Constructeurs
-    public Commande() {
-    }
-
-    public Commande(Long id, String description, LocalDate date, Utilisateur utilisateur) {
-        this.id = id;
-        this.description = description;
-        this.date = date;
-        this.utilisateur = utilisateur;
-    }
-
+    // Getters et Setters
     public Long getId() {
         return id;
     }
@@ -47,12 +37,20 @@ public class Commande {
         this.description = description;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getDateCommande() {
+        return dateCommande;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDateCommande(LocalDateTime dateCommande) {
+        this.dateCommande = dateCommande;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Utilisateur getUtilisateur() {
